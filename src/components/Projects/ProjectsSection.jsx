@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "./ProjectCard";
-import ProjectsData from "./projects.json";
+import ProjectsData from "./Projects.json";
 
 const ProjectsSection = () => {
   // Animation variants for staggered children animation
