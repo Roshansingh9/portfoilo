@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { XMLParser } from "fast-xml-parser";
 
-const MediumLatestArticles = ({ username, maxItems = 5 }) => {
+const MediumLatestArticles = ({ username = "testuser", maxItems = 5 }) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -9,26 +8,70 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
   useEffect(() => {
     const fetchFeed = async () => {
       try {
-        const CORS_PROXY = "https://api.allorigins.win/get?url=";
+        setLoading(true);
+        setError(null);
+
+        // Multiple CORS proxy options to try
+        const proxies = [
+          "https://api.allorigins.win/get?url=",
+          "https://corsproxy.io/?",
+          "https://api.codetabs.com/v1/proxy?quest=",
+        ];
+
         const rssUrl = `https://medium.com/feed/@${username}`;
-        const response = await fetch(CORS_PROXY + encodeURIComponent(rssUrl));
+        let success = false;
+        let lastError = null;
 
-        if (!response.ok) throw new Error("Network response was not ok");
+        // Try each proxy until one works
+        for (const proxy of proxies) {
+          try {
+            const response = await fetch(proxy + encodeURIComponent(rssUrl), {
+              method: "GET",
+              headers: {
+                Accept: "application/json, text/plain, */*",
+              },
+            });
 
-        const data = await response.json();
-        const parser = new XMLParser({
-          ignoreAttributes: false,
-          attributeNamePrefix: "@_",
-        });
+            if (!response.ok) {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
 
-        const feed = parser.parse(data.contents);
+            const data = await response.json();
+            let xmlContent = data.contents || data;
 
-        // Medium RSS structure is: rss > channel > item[]
-        const items = feed.rss.channel.item;
+            // Handle different proxy response formats
+            if (typeof xmlContent !== "string") {
+              xmlContent = JSON.stringify(xmlContent);
+            }
 
-        setArticles(items.slice(0, maxItems));
+            // Parse XML manually (simple parser for RSS)
+            const articles = parseRSSFeed(xmlContent);
+
+            if (articles && articles.length > 0) {
+              setArticles(articles.slice(0, maxItems));
+              success = true;
+              break;
+            }
+          } catch (err) {
+            lastError = err;
+            console.log(`Proxy ${proxy} failed:`, err.message);
+            continue;
+          }
+        }
+
+        if (!success) {
+          throw lastError || new Error("All proxy attempts failed");
+        }
       } catch (err) {
-        setError("Failed to load Medium articles: " + err.message);
+        console.error("Feed fetch error:", err);
+        setError(
+          `Unable to load Medium articles. This might be due to CORS restrictions or network issues. Error: ${err.message}`
+        );
+
+        // Load mock data for demonstration
+        setArticles(getMockArticles());
       } finally {
         setLoading(false);
       }
@@ -36,6 +79,86 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
 
     fetchFeed();
   }, [username, maxItems]);
+
+  // Simple RSS parser
+  const parseRSSFeed = (xmlString) => {
+    try {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+
+      // Check for XML parsing errors
+      const parserError = xmlDoc.querySelector("parsererror");
+      if (parserError) {
+        throw new Error("Invalid XML format");
+      }
+
+      const items = xmlDoc.querySelectorAll("item");
+      const articles = [];
+
+      items.forEach((item, index) => {
+        if (index < maxItems) {
+          const title = item.querySelector("title")?.textContent || "Untitled";
+          const link = item.querySelector("link")?.textContent || "#";
+          const description =
+            item.querySelector("description")?.textContent || "";
+          const pubDate =
+            item.querySelector("pubDate")?.textContent ||
+            new Date().toISOString();
+          const guid =
+            item.querySelector("guid")?.textContent || `${link}-${index}`;
+
+          articles.push({
+            title: cleanText(title),
+            link,
+            description,
+            pubDate,
+            guid,
+          });
+        }
+      });
+
+      return articles;
+    } catch (err) {
+      console.error("RSS parsing error:", err);
+      return [];
+    }
+  };
+
+  // Clean text content
+  const cleanText = (text) => {
+    return text
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&");
+  };
+
+  // Mock data for demonstration when real feed fails
+  const getMockArticles = () => [
+    {
+      title: "Understanding React Hooks: A Complete Guide",
+      link: "https://medium.com/@example/react-hooks-guide",
+      description:
+        "React Hooks have revolutionized how we write components. In this comprehensive guide, we'll explore useState, useEffect, and custom hooks...",
+      pubDate: new Date(Date.now() - 86400000).toISOString(),
+      guid: "mock-1",
+    },
+    {
+      title: "Building Modern Web Applications with Next.js",
+      link: "https://medium.com/@example/nextjs-guide",
+      description:
+        "Next.js provides an excellent framework for building production-ready React applications. Learn about SSR, routing, and optimization...",
+      pubDate: new Date(Date.now() - 172800000).toISOString(),
+      guid: "mock-2",
+    },
+    {
+      title: "The Future of Web Development: Trends to Watch",
+      link: "https://medium.com/@example/web-dev-trends",
+      description:
+        "Explore the latest trends shaping web development, from AI integration to new JavaScript frameworks and progressive web apps...",
+      pubDate: new Date(Date.now() - 259200000).toISOString(),
+      guid: "mock-3",
+    },
+  ];
 
   // Function to extract text content from HTML and limit characters
   const getPreviewText = (htmlContent, maxLength = 200) => {
@@ -53,15 +176,13 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
       : textContent;
   };
 
-  // Function to extract image from article content - prioritize cover images
+  // Function to extract image from article content
   const getArticleImage = (htmlContent) => {
     if (!htmlContent) return null;
 
-    // Look for images in the content, prioritizing larger ones (likely cover images)
     const imgMatches = htmlContent.match(/<img[^>]+src="([^">]+)"[^>]*>/g);
     if (!imgMatches) return null;
 
-    // Get the first image (usually the cover image in Medium articles)
     const firstImgMatch = imgMatches[0].match(/src="([^">]+)"/);
     return firstImgMatch ? firstImgMatch[1] : null;
   };
@@ -77,17 +198,6 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-black flex justify-center items-center p-4">
-        <div className="bg-red-900 bg-opacity-20 border border-red-600 rounded-xl p-6 text-red-300 max-w-md text-center">
-          <h3 className="text-lg font-semibold mb-2">Error Loading Articles</h3>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black">
       <div className="max-w-4xl mx-auto px-4 py-16">
@@ -96,8 +206,22 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">
             Latest Articles
           </h2>
-          <p className="text-gray-400 text-lg">from Medium</p>
+          <p className="text-gray-400 text-lg">
+            from Medium {error && "(Demo Mode)"}
+          </p>
         </div>
+
+        {/* Error Message (if any) */}
+        {error && (
+          <div className="bg-yellow-900 bg-opacity-20 border border-yellow-600 rounded-xl p-4 mb-8 text-yellow-300">
+            <h4 className="font-semibold mb-2">Note:</h4>
+            <p className="text-sm">
+              Unable to fetch live Medium articles due to CORS restrictions.
+              Showing demo content instead. To fix this in production, consider
+              using a server-side proxy or RSS aggregation service.
+            </p>
+          </div>
+        )}
 
         {/* Articles Grid */}
         <div className="grid grid-cols-1 gap-8">
@@ -133,7 +257,7 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
                       href={article.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="line-clamp-2"
+                      className="hover:text-blue-400 transition-colors duration-200"
                     >
                       {article.title}
                     </a>
@@ -141,7 +265,7 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
 
                   {/* Article Preview */}
                   {previewText && (
-                    <p className="text-gray-300 mb-8 leading-relaxed line-clamp-4 text-lg">
+                    <p className="text-gray-300 mb-8 leading-relaxed text-lg">
                       {previewText}
                     </p>
                   )}
@@ -172,7 +296,7 @@ const MediumLatestArticles = ({ username, maxItems = 5 }) => {
         </div>
 
         {/* Empty State */}
-        {articles.length === 0 && (
+        {articles.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-lg">
               No articles found for @{username}
