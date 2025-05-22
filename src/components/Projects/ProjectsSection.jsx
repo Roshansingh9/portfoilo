@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import ProjectCard from "./ProjectCard";
-import ProjectsData from "./Projects.json";
+import { projectsData } from "./projects.js"; // Alternative: Using JS file instead of JSON
 
 const ProjectsSection = () => {
   // Animation variants for staggered children animation
@@ -37,7 +37,7 @@ const ProjectsSection = () => {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {ProjectsData.map((project) => (
+          {projectsData.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </motion.div>
