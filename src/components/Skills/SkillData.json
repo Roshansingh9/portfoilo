@@ -1,0 +1,189 @@
+{
+  "layers": [
+    {
+      "id": "frontend",
+      "name": "Frontend",
+      "position": { "x": 150, "y": 225 },
+      "skills": [
+        {
+          "name": "React",
+          "icon": "⚛️",
+          "color": "#61dafb"
+        },
+        {
+          "name": "JavaScript",
+          "icon": "🟨",
+          "color": "#f7df1e"
+        },
+
+        {
+          "name": "HTML/CSS",
+          "icon": "🎨",
+          "color": "#e34f26"
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "name": "Backend",
+      "position": { "x": 300, "y": 225 },
+      "skills": [
+        {
+          "name": "Node.js",
+          "icon": "🟢",
+          "color": "#339933"
+        },
+        {
+          "name": "FastAPI",
+          "icon": "⚡",
+          "color": "#009688"
+        },
+        {
+          "name": "Python",
+          "icon": "🐍",
+          "color": "#3776ab"
+        },
+        {
+          "name": "Express",
+          "icon": "🚀",
+          "color": "#000000"
+        }
+      ]
+    },
+    {
+      "id": "ai_ml",
+      "name": "AI/ML",
+      "position": { "x": 450, "y": 225 },
+      "skills": [
+        {
+          "name": "TensorFlow",
+          "icon": "🧠",
+          "color": "#ff6f00"
+        },
+        {
+          "name": "PyTorch",
+          "icon": "🔥",
+          "color": "#ee4c2c"
+        },
+        {
+          "name": "Groq",
+          "icon": "⚡",
+          "color": "#f97316"
+        },
+        {
+          "name": "HuggingFace",
+          "icon": "🤗",
+          "color": "#ffcc02"
+        },
+        {
+          "name": "LangChain",
+          "icon": "🔗",
+          "color": "#1c64f2"
+        },
+        {
+          "name": "Ollama",
+          "icon": "🦙",
+          "color": "#6b7280"
+        }
+      ]
+    },
+    {
+      "id": "database",
+      "name": "Database",
+      "position": { "x": 600, "y": 225 },
+      "skills": [
+        {
+          "name": "MongoDB",
+          "icon": "🍃",
+          "color": "#4db33d"
+        },
+        {
+          "name": "PostgreSQL",
+          "icon": "🐘",
+          "color": "#336791"
+        },
+        {
+          "name": "ChromaDB",
+          "icon": "🎨",
+          "color": "#ff4081"
+        },
+        {
+          "name": "Qdrant",
+          "icon": "🔍",
+          "color": "#dc2626"
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "name": "DevOps",
+      "position": { "x": 750, "y": 225 },
+      "skills": [
+        {
+          "name": "Git",
+          "icon": "📋",
+          "color": "#f05032"
+        },
+        {
+          "name": "Docker",
+          "icon": "🐳",
+          "color": "#2496ed"
+        },
+        {
+          "name": "Kubernetes",
+          "icon": "☸️",
+          "color": "#326ce5"
+        },
+        {
+          "name": "AWS",
+          "icon": "☁️",
+          "color": "#232f3e"
+        },
+        {
+          "name": "Terraform",
+          "icon": "🏗️",
+          "color": "#7b42bc"
+        }
+      ]
+    },
+    {
+      "id": "output",
+      "name": "My Tech Stack",
+      "position": { "x": 900, "y": 225 },
+      "skills": [
+        {
+          "name": "My Tech Stack",
+          "icon": "🚀",
+          "color": "#8b5cf6"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    { "from": { "layer": 0, "skill": 0 }, "to": { "layer": 1, "skill": 0 } },
+    { "from": { "layer": 0, "skill": 0 }, "to": { "layer": 1, "skill": 1 } },
+    { "from": { "layer": 0, "skill": 1 }, "to": { "layer": 1, "skill": 0 } },
+    { "from": { "layer": 0, "skill": 1 }, "to": { "layer": 1, "skill": 2 } },
+    { "from": { "layer": 0, "skill": 2 }, "to": { "layer": 1, "skill": 3 } },
+    { "from": { "layer": 1, "skill": 0 }, "to": { "layer": 2, "skill": 0 } },
+    { "from": { "layer": 1, "skill": 0 }, "to": { "layer": 2, "skill": 1 } },
+    { "from": { "layer": 1, "skill": 1 }, "to": { "layer": 2, "skill": 2 } },
+    { "from": { "layer": 1, "skill": 2 }, "to": { "layer": 2, "skill": 3 } },
+    { "from": { "layer": 1, "skill": 3 }, "to": { "layer": 2, "skill": 4 } },
+    { "from": { "layer": 2, "skill": 0 }, "to": { "layer": 3, "skill": 0 } },
+    { "from": { "layer": 2, "skill": 1 }, "to": { "layer": 3, "skill": 1 } },
+    { "from": { "layer": 2, "skill": 2 }, "to": { "layer": 3, "skill": 2 } },
+    { "from": { "layer": 2, "skill": 3 }, "to": { "layer": 3, "skill": 3 } },
+    { "from": { "layer": 2, "skill": 4 }, "to": { "layer": 3, "skill": 0 } },
+    { "from": { "layer": 2, "skill": 5 }, "to": { "layer": 3, "skill": 1 } },
+    { "from": { "layer": 3, "skill": 0 }, "to": { "layer": 4, "skill": 0 } },
+    { "from": { "layer": 3, "skill": 1 }, "to": { "layer": 4, "skill": 1 } },
+    { "from": { "layer": 3, "skill": 2 }, "to": { "layer": 4, "skill": 2 } },
+    { "from": { "layer": 3, "skill": 3 }, "to": { "layer": 4, "skill": 3 } },
+    { "from": { "layer": 4, "skill": 0 }, "to": { "layer": 5, "skill": 0 } },
+    { "from": { "layer": 4, "skill": 1 }, "to": { "layer": 5, "skill": 0 } },
+    { "from": { "layer": 4, "skill": 2 }, "to": { "layer": 5, "skill": 0 } },
+    { "from": { "layer": 4, "skill": 3 }, "to": { "layer": 5, "skill": 0 } },
+    { "from": { "layer": 4, "skill": 4 }, "to": { "layer": 5, "skill": 0 } }
+  ]
+}
