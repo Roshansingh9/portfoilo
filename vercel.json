@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/employeemanagement/:path*",
-      "destination": "https://keploy-assignment-2.vercel.app/:path*"
+      "destination": "https://keploy-assignment-2.vercel.app/:path*/"
     }
   ]
 }
